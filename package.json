@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "./scripts/dev.sh up",
     "dev:down": "./scripts/dev.sh down",
+    "dev:local": "prisma generate && DATABASE_URL=postgresql://postgres:postgres@localhost:5432/demo_project vite dev",
     "db:migrate": "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/demo_project prisma migrate dev",
     "build": "vite build",
     "serve": "vite preview",

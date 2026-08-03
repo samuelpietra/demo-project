@@ -66,6 +66,7 @@ bun run dev:down
 
 - `bun run dev` - Start development server with Docker
 - `bun run dev:down` - Stop Docker services
+- `bun run dev:local` - Run the app locally (Vite) against Dockerized Postgres, without rebuilding the app container. Requires `docker compose -f docker-compose.dev.yml up -d postgres` first.
 - `bun run build` - Build for production
 - `bun run test` - Run e2e tests with Playwright
 - `bun run test:ui` - Run e2e tests with Playwright UI
