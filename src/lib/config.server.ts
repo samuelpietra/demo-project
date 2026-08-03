@@ -1,3 +1,5 @@
+import { serverEnv } from "./env.server";
+
 class AppConfigService<ConfigType> {
   private config: ConfigType;
   constructor(inputFig: ConfigType) {
@@ -15,6 +17,6 @@ class AppConfigService<ConfigType> {
 }
 
 export const configService = new AppConfigService({
-  environment: process.env.ENVIRONMENT as "development" | "test" | "staging" | "production",
-  database: { url: process.env.DATABASE_URL },
+  environment: serverEnv.ENVIRONMENT,
+  database: { url: serverEnv.DATABASE_URL },
 });
