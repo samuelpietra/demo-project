@@ -8,11 +8,18 @@ import { signInServerFn } from "@/lib/auth.server";
 import { getServerSidePrismaClient } from "@/lib/db.server";
 import { configService } from "@/lib/config.server";
 
+// Environments where the dev-only user listing is allowed: non-shared tiers
+// with no real data. Staging/production (and anything unexpected) are denied.
+const DEBUG_ALLOWED_ENVIRONMENTS: readonly string[] = ["development", "test"];
+
 const getAllUsersServerFn = createServerFn().handler(async () => {
-  if (configService.getAppConfig().environment === "production") throw new Error("Forbidden!");
+  // Fail closed: deny unless we're in an allowed non-shared environment.
+  const isAllowedEnvironment = DEBUG_ALLOWED_ENVIRONMENTS.includes(configService.getAppConfig().environment);
+  if (!isAllowedEnvironment) throw new Error("Forbidden!");
   const prisma = await getServerSidePrismaClient();
+  // Never select `password` (the hash) — the debug UI has no need for it.
   return prisma.user.findMany({
-    select: { id: true, email: true, name: true, createdAt: true, password: true },
+    select: { id: true, email: true, name: true, createdAt: true },
   });
 });
 
