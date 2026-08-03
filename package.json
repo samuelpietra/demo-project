@@ -29,6 +29,7 @@
     "@tanstack/react-router-ssr-query": "^1.139.3",
     "@tanstack/react-start": "^1.139.3",
     "@tanstack/router-plugin": "^1.139.3",
+    "bcryptjs": "^3.0.3",
     "lucide-react": "^0.562.0",
     "motion": "^12.26.2",
     "nitro": "^3.0.1-alpha.1",

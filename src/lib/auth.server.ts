@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import bcrypt from "bcryptjs";
 import { redirect } from "@tanstack/react-router";
 import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
 import { createMiddleware, createServerFn } from "@tanstack/react-start";
@@ -8,6 +9,15 @@ import { z } from "zod";
 
 // In production, use a proper secret from environment variables
 const COOKIE_SECRET = process.env.COOKIE_SECRET || "dev-secret-change-in-production";
+
+// bcrypt work factor: higher is more resistant to brute force but costs more
+// CPU per hash. 10 is the widely-used default; raise it as hardware improves.
+const BCRYPT_SALT_ROUNDS = 10;
+
+// A precomputed hash used to run a bcrypt comparison even when no user is
+// found, so sign-in response timing does not reveal whether an email exists
+// (mitigates user enumeration).
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync("no-user-timing-equalizer", BCRYPT_SALT_ROUNDS);
 
 /**
  * Signs a user ID to create a tamper-proof session token
@@ -81,7 +91,10 @@ export const signInServerFn = createServerFn({ method: "POST" })
       where: { email },
     });
 
-    if (!user || user.password !== password) {
+    // Always run a comparison (against a dummy hash when the user is missing)
+    // so the response time does not leak whether the email is registered.
+    const passwordValid = await bcrypt.compare(password, user?.password ?? DUMMY_PASSWORD_HASH);
+    if (!user || !passwordValid) {
       return { success: false as const, error: "Invalid email or password" };
     }
 
@@ -108,8 +121,9 @@ export const createAccountServerFn = createServerFn({ method: "POST" })
       return { success: false as const, error: "An account with this email already exists" };
     }
 
+    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
     const user = await prisma.user.create({
-      data: { email, name, password },
+      data: { email, name, password: passwordHash },
     });
 
     setSessionCookie(user.id);
