@@ -72,6 +72,19 @@ bun run dev:down
 - `bun run test:ui` - Run e2e tests with Playwright UI
 - `bun run typecheck` - Run TypeScript type checking
 - `bun run db:migrate` - Run database migrations
+- `bun run db:seed` - Seed the database with demo users and sample data
+
+## Demo Accounts
+
+Run `bun run db:seed` to populate the database with three demo users (all with password `demo1234`):
+
+| Email                | Password   | Data                                    |
+| -------------------- | ---------- | --------------------------------------- |
+| `arnold@example.com` | `demo1234` | Movements + workout history             |
+| `ronnie@example.com` | `demo1234` | Movements + workout history             |
+| `john@example.com`   | `demo1234` | Empty account (for fresh/empty states)  |
+
+In the `development` and `test` environments, the sign-in page shows a panel with one-click logins for these accounts.
 
 ## Project Structure
 
