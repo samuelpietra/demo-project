@@ -48,6 +48,7 @@ Please use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/
 
 - Bun runtime installed
 - Docker (for PostgreSQL)
+- Node.js 22 — required only for the Playwright e2e test runner (`bun run test` runs Playwright under Node; without Node the runner can't spawn its workers). An `.nvmrc` is included, so `nvm use` selects the right version.
 
 ### Getting Started
 
