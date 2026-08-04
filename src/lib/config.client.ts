@@ -37,3 +37,13 @@ export function useClientConfig(): ClientConfig {
   const config = useMemo(() => getClientConfig(), []);
   return config;
 }
+
+// Environments where demo tooling (seed logins, dev-only panels) is enabled:
+// the non-shared tiers with no real data.
+const DEMO_ENVIRONMENTS: readonly ClientConfig["environment"][] = ["development", "test"];
+
+/** True when running in a demo-enabled environment (development / test). */
+export function useIsDemoEnvironment(): boolean {
+  const { environment } = useClientConfig();
+  return useMemo(() => DEMO_ENVIRONMENTS.includes(environment), [environment]);
+}

@@ -12,7 +12,9 @@ const BCRYPT_ROUNDS = 10;
 const DAY = 24 * 60 * 60 * 1000;
 
 type SeedSet = { movement: string; weight: number; reps: number };
-type SeedWorkout = { daysAgo: number; sets: SeedSet[] };
+// `active: true` -> an in-progress workout (completedAt: null); otherwise it is
+// completed `daysAgo` days ago and appears in history.
+type SeedWorkout = { daysAgo?: number; active?: boolean; sets: SeedSet[] };
 type SeedContent = {
   movements: { name: string; isBodyweight: boolean }[];
   workouts: SeedWorkout[];
@@ -53,6 +55,14 @@ const CONTENT: Record<string, SeedContent> = {
           { movement: "Squat", weight: 110, reps: 5 },
           { movement: "Deadlift", weight: 130, reps: 5 },
           { movement: "Pull-ups", weight: 0, reps: 12 },
+        ],
+      },
+      {
+        // In-progress workout so Arnold has a "current workout" as well as history.
+        active: true,
+        sets: [
+          { movement: "Bench Press", weight: 72, reps: 5 },
+          { movement: "Squat", weight: 115, reps: 5 },
         ],
       },
     ],
@@ -123,7 +133,10 @@ async function seedAccount(account: (typeof DEMO_ACCOUNTS)[number]) {
 
   for (const w of content.workouts) {
     const workout = await prisma.workout.create({
-      data: { userId: user.id, completedAt: new Date(Date.now() - w.daysAgo * DAY) },
+      data: {
+        userId: user.id,
+        completedAt: w.active ? null : new Date(Date.now() - (w.daysAgo ?? 0) * DAY),
+      },
     });
     for (const s of w.sets) {
       await prisma.set.create({

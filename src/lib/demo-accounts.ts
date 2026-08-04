@@ -18,27 +18,23 @@ export interface DemoAccount {
   description: string;
 }
 
-// Environments allowed to see/use demo tooling (matches the app's non-shared,
-// no-real-data tiers).
-export const DEMO_ENVIRONMENTS: readonly string[] = ["development", "test"];
-
 export const DEMO_ACCOUNTS: DemoAccount[] = [
   {
     name: "Arnold Schwarzenegger",
     email: "arnold@example.com",
     password: "demo1234",
-    description: "Movements + workout history (progression data)",
+    description: "Current workout + history + movements",
   },
   {
     name: "Ronnie Coleman",
     email: "ronnie@example.com",
     password: "demo1234",
-    description: "Movements + workout history (progression data)",
+    description: "History + movements",
   },
   {
     name: "John Doe",
     email: "john@example.com",
     password: "demo1234",
-    description: "Empty account — fresh/empty states",
+    description: "Empty data",
   },
 ];
