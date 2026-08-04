@@ -23,3 +23,15 @@ export const getWeightEntriesServerFn = createServerFn()
       orderBy: { recordedAt: "asc" },
     });
   });
+
+// Most recent weigh-in (or null). Used to default the weight field for
+// body-weight movements in the current workout.
+export const getLatestWeightServerFn = createServerFn()
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    const prisma = await getServerSidePrismaClient();
+    return prisma.weightEntry.findFirst({
+      where: { userId: context.user.id },
+      orderBy: { recordedAt: "desc" },
+    });
+  });
