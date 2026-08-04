@@ -15,9 +15,11 @@ type SeedSet = { movement: string; weight: number; reps: number };
 // `active: true` -> an in-progress workout (completedAt: null); otherwise it is
 // completed `daysAgo` days ago and appears in history.
 type SeedWorkout = { daysAgo?: number; active?: boolean; sets: SeedSet[] };
+type SeedWeight = { daysAgo: number; weight: number };
 type SeedContent = {
   movements: { name: string; isBodyweight: boolean }[];
   workouts: SeedWorkout[];
+  weights?: SeedWeight[];
 };
 
 // Per-user content, keyed by email. John Doe is intentionally absent (empty account).
@@ -66,6 +68,13 @@ const CONTENT: Record<string, SeedContent> = {
         ],
       },
     ],
+    weights: [
+      { daysAgo: 28, weight: 232 },
+      { daysAgo: 21, weight: 234 },
+      { daysAgo: 14, weight: 235 },
+      { daysAgo: 7, weight: 237 },
+      { daysAgo: 1, weight: 238 },
+    ],
   },
   "ronnie@example.com": {
     movements: [
@@ -102,6 +111,13 @@ const CONTENT: Record<string, SeedContent> = {
         ],
       },
     ],
+    weights: [
+      { daysAgo: 28, weight: 296 },
+      { daysAgo: 21, weight: 297 },
+      { daysAgo: 14, weight: 298 },
+      { daysAgo: 7, weight: 300 },
+      { daysAgo: 1, weight: 302 },
+    ],
   },
   "john@example.com": { movements: [], workouts: [] },
 };
@@ -113,6 +129,7 @@ async function seedAccount(account: (typeof DEMO_ACCOUNTS)[number]) {
     await prisma.set.deleteMany({ where: { workout: { userId: existing.id } } });
     await prisma.workout.deleteMany({ where: { userId: existing.id } });
     await prisma.movement.deleteMany({ where: { userId: existing.id } });
+    await prisma.weightEntry.deleteMany({ where: { userId: existing.id } });
     await prisma.user.delete({ where: { id: existing.id } });
   }
 
@@ -150,8 +167,14 @@ async function seedAccount(account: (typeof DEMO_ACCOUNTS)[number]) {
     }
   }
 
+  for (const w of content.weights ?? []) {
+    await prisma.weightEntry.create({
+      data: { userId: user.id, weight: w.weight, recordedAt: new Date(Date.now() - w.daysAgo * DAY) },
+    });
+  }
+
   console.log(
-    `Seeded ${account.email} — ${content.movements.length} movements, ${content.workouts.length} workouts`,
+    `Seeded ${account.email} — ${content.movements.length} movements, ${content.workouts.length} workouts, ${(content.weights ?? []).length} weigh-ins`,
   );
 }
 
