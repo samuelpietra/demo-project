@@ -19,11 +19,12 @@ model User {
 }
 
 model Movement {
-  id     String @id @default(uuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-  name   String
-  sets   Set[]
+  id           String  @id @default(uuid())
+  userId       String
+  user         User    @relation(fields: [userId], references: [id])
+  name         String
+  isBodyweight Boolean @default(false)
+  sets         Set[]
 
   @@unique([userId, name])
 }

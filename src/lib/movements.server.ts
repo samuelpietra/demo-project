@@ -6,12 +6,12 @@ import { z } from "zod";
 
 export const createMovementServerFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ name: z.string().min(1) }))
+  .inputValidator(z.object({ name: z.string().min(1), isBodyweight: z.boolean().default(false) }))
   .handler(async ({ context, data }) => {
     const prisma = await getServerSidePrismaClient();
     try {
       const movement = await prisma.movement.create({
-        data: { name: data.name, userId: context.user.id },
+        data: { name: data.name, userId: context.user.id, isBodyweight: data.isBodyweight },
       });
       return { success: true as const, movement };
     } catch (error) {
