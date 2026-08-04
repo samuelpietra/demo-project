@@ -32,3 +32,26 @@ export const getMovementsServerFn = createServerFn()
       orderBy: { name: "asc" },
     });
   });
+
+// POST (not DELETE): server functions are RPC over HTTP and only support
+// GET/POST; GET must stay side-effect-free, so mutations use POST.
+export const deleteMovementServerFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ movementId: z.string() }))
+  .handler(async ({ context, data }) => {
+    const prisma = await getServerSidePrismaClient();
+    // Scope to the owner, and count referencing sets in the same lookup.
+    const movement = await prisma.movement.findFirst({
+      where: { id: data.movementId, userId: context.user.id },
+      include: { _count: { select: { sets: true } } },
+    });
+    if (!movement) {
+      return { success: false as const, error: "Movement not found" };
+    }
+    // Don't cascade: a movement with recorded sets is part of workout history.
+    if (movement._count.sets > 0) {
+      return { success: false as const, error: "Cannot delete a movement that is used in workouts" };
+    }
+    await prisma.movement.delete({ where: { id: movement.id } });
+    return { success: true as const };
+  });

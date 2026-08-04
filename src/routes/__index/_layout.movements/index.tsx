@@ -2,8 +2,9 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createMovementServerFn } from "@/lib/movements.server";
+import { createMovementServerFn, deleteMovementServerFn } from "@/lib/movements.server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { X } from "lucide-react";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { movementsQueryOptions } from "./-queries/movements";
 
@@ -32,6 +33,18 @@ function MovementsPage() {
       queryClient.invalidateQueries({ queryKey: movementsQueryOptions().queryKey });
       setName("");
       setIsBodyweight(false);
+    },
+  });
+
+  const deleteMovementMutation = useMutation({
+    mutationFn: (movementId: string) => deleteMovementServerFn({ data: { movementId } }),
+    onSuccess: (result) => {
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
+      setError("");
+      queryClient.invalidateQueries({ queryKey: movementsQueryOptions().queryKey });
     },
   });
 
@@ -92,11 +105,20 @@ function MovementsPage() {
                   key={movement.id}
                   className="px-3 py-2 bg-slate-50 rounded-lg text-sm font-medium text-slate-700 flex items-center justify-between">
                   <span>{movement.name}</span>
-                  {movement.isBodyweight && (
-                    <span className="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
-                      Body-weight
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {movement.isBodyweight && (
+                      <span className="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
+                        Body-weight
+                      </span>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteMovementMutation.mutate(movement.id)}
+                      className="h-8 w-8 text-slate-400 hover:text-red-600">
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </li>
               ))}
             </ul>
