@@ -63,6 +63,26 @@ bun run dev
 bun run dev:down
 ```
 
+### Running locally (recommended for development)
+
+```bash
+nvm use                                                    # Node 22 (Playwright test runner)
+bun install
+docker compose -f docker-compose.dev.yml up -d postgres    # start Postgres
+bun run db:migrate                                         # apply migrations
+bun run db:seed                                            # seed demo users + data
+bun run dev:local                                          # run the app at http://localhost:3902
+```
+
+Then open http://localhost:3902 and use a demo login from the sign-in page.
+
+### Running the tests
+
+```bash
+nvm use            # Node 22 is required for the Playwright test runner
+bun run test       # Playwright e2e suite (boots the app automatically)
+```
+
 ### Available Scripts
 
 - `bun run dev` - Start development server with Docker
