@@ -18,10 +18,16 @@ function MovementsPage() {
   const queryClient = useQueryClient();
   const { data: movements } = useSuspenseQuery(movementsQueryOptions());
   const [name, setName] = useState("");
+  const [error, setError] = useState("");
 
   const createMovementMutation = useMutation({
     mutationFn: (name: string) => createMovementServerFn({ data: { name } }),
-    onSuccess: () => {
+    onSuccess: (result) => {
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
+      setError("");
       queryClient.invalidateQueries({ queryKey: movementsQueryOptions().queryKey });
       setName("");
     },
@@ -30,6 +36,7 @@ function MovementsPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
+    setError("");
     createMovementMutation.mutate(name.trim());
   };
 
@@ -42,6 +49,9 @@ function MovementsPage() {
           <CardTitle>Add New Movement</CardTitle>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-3 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">{error}</div>
+          )}
           <form onSubmit={handleSubmit} className="flex gap-3">
             <Input
               placeholder="Movement name (e.g. Bench Press)"
