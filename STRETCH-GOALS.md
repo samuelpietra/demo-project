@@ -88,6 +88,26 @@ Known rough edges, not yet addressed:
   helper today, built on `Intl.PluralRules` if the app is ever localised. No i18n
   library is installed, and adding one for a handful of strings would mean message
   catalogs for no present benefit.
+- **Card borders render near-black.** Tailwind v4 changed the default border colour from
+  `gray-200` to `currentColor`, and `src/styles.css` carries no compatibility layer, so
+  every unqualified `border` — cards, the dropdown menu — draws a hard dark outline. It
+  is the single biggest visual difference in the app, and the fix is one base layer:
+
+  ```css
+  @layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+      border-color: var(--color-gray-200, currentColor);
+    }
+  }
+  ```
+
+- **No max width on the content column.** `<main>` is `flex-1 p-6`, so on a wide monitor
+  the history table stretches edge to edge and its movement columns end up a screen
+  apart. A `max-w-6xl mx-auto` wrapper caps it.
 - **The wordmark still reads "Better Bookkeeping"** after the rebrand to Visor.
 - **`config.client.ts` logs the client configuration on every page load.**
 
