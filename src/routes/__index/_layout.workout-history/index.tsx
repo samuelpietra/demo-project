@@ -31,6 +31,9 @@ function summarizeSets(sets: { weight: number; reps: number }[]): Metrics {
   };
 }
 
+// One point per completed workout: the README says max weight "on a given day"
+// but total volume "in a workout", and per workout keeps all three metrics on
+// one x-axis. Two workouts in a day therefore plot as two points.
 function computeProgression(workouts: ProgressionWorkout[], movementId: string): ProgressionPoint[] {
   const dataPoints: ProgressionPoint[] = [];
   if (!movementId) return dataPoints;
