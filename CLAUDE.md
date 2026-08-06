@@ -35,20 +35,23 @@ This project uses **Bun** as the package manager and runtime.
 - **Server state**: TanStack Query · **Forms**: TanStack Form
 - **Database**: PostgreSQL + Prisma 7 via the `@prisma/adapter-pg` driver adapter
 - **Styling**: Tailwind CSS v4 (Vite plugin) + local shadcn-style primitives in `src/components/ui`
-- **Runtime**: Bun · **Testing**: Playwright (e2e)
+- **Charts**: Recharts · **Auth**: `bcryptjs` password hashing + signed cookie sessions
+- **Runtime**: Bun · **Testing**: Playwright (e2e; the runner needs Node 22 — see `.nvmrc`)
 - **TypeScript**: strict, path alias `@/*` → `./src/*`
 
 ### Project Structure
 
 - `src/routes/` - File-based routing.
   - `sign-in`, `create-account`, `logout` - auth pages/actions.
-  - `__index/_layout.*` - the authenticated app: `movements`, `current-workout`, `workout-history`. Route-local queries live in `-queries/` folders.
+  - `__index/_layout.*` - the authenticated app: `movements`, `current-workout`, `workout-history`, `weight`. Route-local queries live in `-queries/` folders.
   - `api/health` - health check.
 - `src/lib/` - Server functions and infrastructure. Files named `*.server.ts` are server-only.
   - `auth.server.ts` - session auth (sign in/up, logout, `authMiddleware`).
-  - `movements.server.ts`, `workouts.server.ts` - domain server functions.
-  - `db.server.ts` - lazily-constructed Prisma client (pg adapter).
-  - `config.server.ts` / `config.client.ts` - server/client config.
+  - `movements.server.ts`, `workouts.server.ts`, `weight.server.ts` - domain server functions.
+  - `db.server.ts` - lazily-constructed Prisma client (pg adapter), built from the validated server env.
+  - `env.server.ts` - Zod-validated server environment, parsed once at boot (fail-fast).
+  - `config.client.ts` - client config + `useIsDemoEnvironment` (dev/test-only UI gating).
+  - `demo-accounts.ts` - seeded demo logins surfaced on the sign-in page outside production.
 - `src/components/ui/` - Local UI primitives (button, card, input, select, etc.).
 - `prisma/` - `schema.prisma`, `migrations/`, and generated client (`generated/`, gitignored).
 
@@ -67,14 +70,19 @@ export const doThingServerFn = createServerFn({ method: "POST" })
 
 ### Data model (`prisma/schema.prisma`)
 
-- `User` - id, email (unique), name, password, timestamps; has many `Workout`.
-- `Movement` - id, name. (Currently global — not scoped to a user.)
+- `User` - id, email (unique), name, `password` (bcrypt hash), timestamps; has many `Workout`, `Movement`, `WeightEntry`.
+- `Movement` - belongs to a `User`; `name`, `isBodyweight`. Unique on `[userId, name]`, so names are per-user, not global.
 - `Workout` - belongs to a `User`; `completedAt: null` marks the single active workout; has many `Set`.
 - `Set` - belongs to a `Workout` and a `Movement`; `reps: Int`, `weight: Int`.
+- `WeightEntry` - belongs to a `User`; `weight: Float`, `recordedAt`. Indexed on `[userId, recordedAt]` for history queries.
+
+**Every user-owned model is scoped by `userId`**; domain server functions filter on `context.user.id` rather than trusting a client-supplied id.
 
 ### Auth model
 
-Cookie-based sessions. On sign in/up, a token `"{userId}.{HMAC(userId)}"` is stored in an httpOnly cookie signed with `COOKIE_SECRET`. `getUserServerFn` verifies the signature and loads the user.
+Cookie-based sessions. On sign in/up, a token `"{userId}.{HMAC(userId)}"` is stored in an httpOnly cookie signed with `COOKIE_SECRET`. `getUserServerFn` verifies the signature and loads the user. Passwords are hashed with `bcryptjs`; sign-in runs a compare against a dummy hash when the user is missing, so response timing doesn't leak account existence.
+
+Known limitation: the token embeds no timestamp, so expiry is only the cookie's 7-day `expires` and there is no server-side revocation.
 
 ## Conventions
 
