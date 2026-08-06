@@ -348,10 +348,15 @@ asserts that one user can't read another's movements, or that an unauthenticated
 That's the ownership scoping from finding 2 — exactly the kind of thing a future refactor breaks
 silently.
 
-**The suite doesn't run in CI** — `cicd.yml` runs commitlint, typecheck, and the Docker build. Nothing
-executes these tests on a pull request. The typecheck job it does run has never passed: it installs
-dependencies and runs `tsc` without generating the Prisma client, which is gitignored, so every module
-importing it fails to resolve. In practice nothing in CI has been verifying this code.
+**The suite doesn't run in CI** — `cicd.yml` runs commitlint, typecheck, and the Docker build, so
+nothing executes these tests on a pull request.
+
+That typecheck job had never passed on any commit, including upstream's: it installed dependencies and
+ran `tsc` without generating the Prisma client or the router's route tree, both gitignored, so every
+module importing them failed to resolve. Since `build-and-push` declares `needs: [typecheck]`, the
+image build never ran either. Both are fixed — CI now generates before typechecking, and the published
+image starts (its `CMD` pointed at an entrypoint script that had been deleted upstream). Type errors
+now gate merges; the e2e suite still doesn't run there.
 
 ---
 

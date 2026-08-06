@@ -108,7 +108,10 @@ bun run test       # Playwright e2e suite (boots the app automatically)
 - `bun run setup` - One-shot local setup: Prisma client, Postgres, migrations, demo data, typecheck. Doesn't start the app.
 - `bun run dev` - Start development server with Docker
 - `bun run dev:down` - Stop Docker services
-- `bun run dev:local` - Run the app locally (Vite) against Dockerized Postgres, without rebuilding the app container. Requires `docker compose -f docker-compose.dev.yml up -d postgres` first.
+- `bun run dev:local` - Run the app locally (Vite) against Dockerized Postgres, without rebuilding the app container. Run `bun run setup` first.
+- `bun run generate` - Generate the Prisma client and the router's route tree (both gitignored)
+- `bun run format` - Format the codebase with Prettier
+- `bun run serve` - Preview a production build (run `bun run build` first)
 - `bun run build` - Build for production
 - `bun run test` - Run e2e tests with Playwright
 - `bun run test:ui` - Run e2e tests with Playwright UI
