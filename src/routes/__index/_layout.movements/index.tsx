@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createMovementServerFn, deleteMovementServerFn } from "@/lib/movements.server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { X } from "lucide-react";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { movementsQueryOptions } from "./-queries/movements";
@@ -21,6 +22,7 @@ function MovementsPage() {
   const [name, setName] = useState("");
   const [isBodyweight, setIsBodyweight] = useState(false);
   const [error, setError] = useState("");
+  const [movementToDelete, setMovementToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const createMovementMutation = useMutation({
     mutationFn: (input: { name: string; isBodyweight: boolean }) => createMovementServerFn({ data: input }),
@@ -114,7 +116,7 @@ function MovementsPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => deleteMovementMutation.mutate(movement.id)}
+                      onClick={() => setMovementToDelete({ id: movement.id, name: movement.name })}
                       className="h-8 w-8 text-slate-400 hover:text-red-600">
                       <X className="w-4 h-4" />
                     </Button>
@@ -125,6 +127,18 @@ function MovementsPage() {
           )}
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        open={movementToDelete !== null}
+        title="Delete movement?"
+        description={`"${movementToDelete?.name}" will be removed from your movements.`}
+        isPending={deleteMovementMutation.isPending}
+        onConfirm={() => {
+          if (movementToDelete) deleteMovementMutation.mutate(movementToDelete.id);
+          setMovementToDelete(null);
+        }}
+        onCancel={() => setMovementToDelete(null)}
+      />
     </div>
   );
 }

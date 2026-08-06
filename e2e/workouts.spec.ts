@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { clickAndWaitForServerFn, completeWorkout, createAccount, startWorkout } from "./helpers";
+import { clickAndWaitForServerFn, completeWorkout, createAccount, startWorkout, clickAndConfirm } from "./helpers";
 
 // Start and complete a workout, returning to the no-active-workout state.
 async function createCompletedWorkout(page: Page) {
@@ -76,7 +76,7 @@ test.describe("Workouts", () => {
       await page.goto("/workout-history");
       await page.waitForLoadState("networkidle");
       await page.locator("tbody tr").first().locator('input[type="checkbox"]').check();
-      await clickAndWaitForServerFn(page, page.getByRole("button", { name: /Delete Selected/i }));
+      await clickAndConfirm(page, page.getByRole("button", { name: /Delete Selected/i }));
       await expect(page.getByText(/No completed workouts/i)).toBeVisible();
     });
 

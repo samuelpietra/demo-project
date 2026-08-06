@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { deleteWorkoutsServerFn } from "@/lib/workouts.server";
 import { Trash2 } from "lucide-react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -66,6 +67,7 @@ function WorkoutHistoryPage() {
   const { data: workouts } = useSuspenseQuery(workoutHistoryQueryOptions());
   const [selectedWorkouts, setSelectedWorkouts] = useState<Set<string>>(new Set());
   const [selectedMovementId, setSelectedMovementId] = useState("");
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [metric, setMetric] = useState<MetricKey>("maxWeight");
 
   const deleteWorkoutsMutation = useMutation({
@@ -120,6 +122,7 @@ function WorkoutHistoryPage() {
   const handleDeleteSelected = () => {
     if (selectedWorkouts.size === 0) return;
     deleteWorkoutsMutation.mutate(Array.from(selectedWorkouts));
+    setIsConfirmingDelete(false);
   };
 
   return (
@@ -172,7 +175,11 @@ function WorkoutHistoryPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Completed Workouts</CardTitle>
-          <Button size="sm" variant="destructive" onClick={handleDeleteSelected} disabled={selectedWorkouts.size === 0}>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => setIsConfirmingDelete(true)}
+            disabled={selectedWorkouts.size === 0}>
             <Trash2 className="w-4 h-4 mr-2" />
             {deleteWorkoutsMutation.isPending ? "Deleting..." : `Delete Selected (${selectedWorkouts.size})`}
           </Button>
@@ -262,6 +269,15 @@ function WorkoutHistoryPage() {
           )}
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        open={isConfirmingDelete}
+        title="Delete selected workouts?"
+        description="Their sets will be removed from your history. This can't be undone."
+        isPending={deleteWorkoutsMutation.isPending}
+        onConfirm={handleDeleteSelected}
+        onCancel={() => setIsConfirmingDelete(false)}
+      />
     </div>
   );
 }

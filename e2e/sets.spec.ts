@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { addMovement, addSet, clickAndWaitForServerFn, createAccount, startWorkout } from "./helpers";
+import { addMovement, addSet, clickAndWaitForServerFn, createAccount, startWorkout, clickAndConfirm } from "./helpers";
 
 test.describe("Sets", () => {
   test.beforeEach(async ({ page }) => {
@@ -63,7 +63,7 @@ test.describe("Sets", () => {
       await addSet(page, "Bench Press", 100, 5);
       const row = page.getByRole("listitem").filter({ hasText: "Bench Press" });
       await expect(row).toBeVisible();
-      await clickAndWaitForServerFn(page, row.getByRole("button"));
+      await clickAndConfirm(page, row.getByRole("button"));
       await expect(row).toHaveCount(0);
     });
 
@@ -73,7 +73,7 @@ test.describe("Sets", () => {
       await addSet(page, "Squat", 80, 8);
       await expect(page.getByRole("listitem").filter({ hasText: "Squat" })).toBeVisible();
       const bench = page.getByRole("listitem").filter({ hasText: "Bench Press" });
-      await clickAndWaitForServerFn(page, bench.getByRole("button"));
+      await clickAndConfirm(page, bench.getByRole("button"));
       await expect(bench).toHaveCount(0);
       await expect(page.getByRole("listitem").filter({ hasText: "Squat" })).toBeVisible();
     });

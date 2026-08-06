@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { addMovement, clickAndWaitForServerFn, createAccount } from "./helpers";
+import { addMovement, clickAndConfirm, clickAndWaitForServerFn, createAccount } from "./helpers";
 
 test.describe("Movements", () => {
   test.beforeEach(async ({ page }) => {
@@ -48,7 +48,7 @@ test.describe("Movements", () => {
     test("should delete an existing movement", async ({ page }) => {
       await addMovement(page, "Overhead Press");
       const row = page.getByRole("listitem").filter({ hasText: "Overhead Press" });
-      await clickAndWaitForServerFn(page, row.getByRole("button"));
+      await clickAndConfirm(page, row.getByRole("button"));
       await expect(row).toHaveCount(0);
     });
 
@@ -56,7 +56,7 @@ test.describe("Movements", () => {
       await addMovement(page, "Lunge");
       await addMovement(page, "Plank");
       const lunge = page.getByRole("listitem").filter({ hasText: "Lunge" });
-      await clickAndWaitForServerFn(page, lunge.getByRole("button"));
+      await clickAndConfirm(page, lunge.getByRole("button"));
       await expect(lunge).toHaveCount(0);
       await expect(page.getByRole("listitem").filter({ hasText: "Plank" })).toBeVisible();
     });

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   createWorkoutServerFn,
   completeWorkoutServerFn,
@@ -37,6 +38,7 @@ function CurrentWorkoutPage() {
   const [selectedMovement, setSelectedMovement] = useState("");
   const [reps, setReps] = useState("");
   const [weight, setWeight] = useState("");
+  const [setToDelete, setSetToDelete] = useState<{ id: string; label: string } | null>(null);
 
   const handleMovementChange = (movementId: string) => {
     setSelectedMovement(movementId);
@@ -172,7 +174,12 @@ function CurrentWorkoutPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => deleteSetMutation.mutate(set.id)}
+                    onClick={() =>
+                      setSetToDelete({
+                        id: set.id,
+                        label: `${set.movement.name} — ${set.reps} reps × ${set.weight} lbs`,
+                      })
+                    }
                     className="h-8 w-8 text-slate-400">
                     <X className="w-4 h-4" />
                   </Button>
@@ -182,6 +189,18 @@ function CurrentWorkoutPage() {
           )}
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        open={setToDelete !== null}
+        title="Delete set?"
+        description={setToDelete?.label}
+        isPending={deleteSetMutation.isPending}
+        onConfirm={() => {
+          if (setToDelete) deleteSetMutation.mutate(setToDelete.id);
+          setSetToDelete(null);
+        }}
+        onCancel={() => setSetToDelete(null)}
+      />
     </div>
   );
 }

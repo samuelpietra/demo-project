@@ -17,6 +17,27 @@ export async function clickAndWaitForServerFn(page: Page, locator: Locator) {
   }
 }
 
+/**
+ * Click a control that opens a confirmation dialog, then confirm it.
+ *
+ * The trigger only sets state, so it fires no request to wait on — retry it
+ * until the dialog appears, then treat the confirm button as a normal
+ * server-function click.
+ */
+export async function clickAndConfirm(page: Page, trigger: Locator, confirmName: RegExp = /^Delete$/) {
+  const dialog = page.getByRole("dialog");
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await trigger.click();
+    const appeared = await dialog
+      .waitFor({ state: "visible", timeout: 2_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (appeared) break;
+  }
+  await expect(dialog).toBeVisible();
+  await clickAndWaitForServerFn(page, dialog.getByRole("button", { name: confirmName }));
+}
+
 /** Create a fresh, unique account and land authenticated on the app. */
 export async function createAccount(page: Page): Promise<string> {
   const email = `e2e-${randomUUID()}@example.com`;
