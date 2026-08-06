@@ -81,6 +81,9 @@ security check at runtime. Required variables:
 | `DATABASE_URL`  | PostgreSQL connection string.                                                                                                                                                                                                                            |
 | `COOKIE_SECRET` | HMAC key for session cookies. **No default on purpose** — a fallback baked into the source would be public, which would make every session token forgeable. Generate one with `openssl rand -hex 32`, and set a distinct value per deployed environment. |
 
+Security findings, fixes, and accepted risks are documented in [SECURITY-AUDIT.md](./SECURITY-AUDIT.md).
+Notes on the nutrition and database stretch goals are in [STRETCH-GOALS.md](./STRETCH-GOALS.md).
+
 ### Running locally (recommended for development)
 
 ```bash
