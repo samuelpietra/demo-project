@@ -51,7 +51,9 @@ function setSessionCookie(userId: string) {
 
   setCookie(sessionCookieName, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    // Reads the validated ENVIRONMENT like the rest of the codebase: an
+    // unexpected NODE_ENV would silently drop Secure and send cookies in clear.
+    secure: serverEnv.ENVIRONMENT === "production",
     sameSite: "lax",
     expires: expiresAt,
   });

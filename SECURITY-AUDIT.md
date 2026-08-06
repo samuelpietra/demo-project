@@ -2,7 +2,7 @@
 
 **Scope:** authentication, data ownership, and secret handling.
 **Method:** every finding below was reproduced against the running app, not inferred from reading source.
-**Result:** 7 issues fixed, 3 accepted with reasoning, 1 recommended.
+**Result:** 8 issues fixed, 2 accepted with reasoning, 1 recommended.
 
 ---
 
@@ -20,7 +20,7 @@
 | 8   | Sessions cannot expire or be revoked                         | 🟡 Medium   | ⚠️ Accepted    |
 | 9   | No rate limiting on authentication                           | 🟡 Medium   | 📋 Recommended |
 | 10  | Session signature compared in non-constant time              | ⚪ Low      | ⚠️ Accepted    |
-| 11  | `Secure` cookie flag keys off the wrong variable             | ⚪ Low      | ⚠️ Accepted    |
+| 11  | `Secure` cookie flag keys off the wrong variable             | ⚪ Low      | ✅ Fixed       |
 
 > **The pattern worth noticing:** findings 4, 5, and 6 are the same mistake three times — returning a whole
 > object from the server and trusting that nobody reads the extra fields. An explicit `select` at the
@@ -314,15 +314,25 @@ fix both together, starting with 9.
 
 ---
 
-## 11 · `Secure` cookie flag keys off the wrong variable ⚠️ Accepted
+## 11 · `Secure` cookie flag keyed off the wrong variable ✅
+
+**Before**
 
 ```ts
 secure: process.env.NODE_ENV === "production",   // everything else reads serverEnv.ENVIRONMENT
 ```
 
-If a deployed container's `NODE_ENV` is anything but exactly `"production"`, session cookies go out
-without `Secure` and can travel over plain HTTP. Same fail-open shape as finding 3, lower impact.
-Should read `serverEnv.ENVIRONMENT` for consistency.
+**Risk** — if a deployed container's `NODE_ENV` is anything but exactly `"production"`, session
+cookies go out without `Secure` and can travel over plain HTTP. Same fail-open shape as finding 3,
+lower impact.
+
+**After**
+
+```ts
+secure: serverEnv.ENVIRONMENT === "production",
+```
+
+One validated source of truth for the environment, so this can't disagree with the checks around it.
 
 ---
 
@@ -351,4 +361,4 @@ importing it fails to resolve. In practice nothing in CI has been verifying this
 2. **Server-side sessions** with revocation (finding 8), plus rotation on password change.
 3. **Authorization tests** — cross-user access denied, unauthenticated calls rejected.
 4. **Run the e2e suite in CI**, so the above can't silently regress.
-5. The two one-liners: `timingSafeEqual` (10) and the `Secure` flag (11).
+5. The remaining one-liner: `timingSafeEqual` (10).
