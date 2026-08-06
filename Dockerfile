@@ -26,4 +26,4 @@ FROM deps AS production
 WORKDIR /app
 ARG NODE_ENV
 RUN NODE_ENV=$NODE_ENV bun run build
-CMD ["./scripts/entry.sh"]
+CMD ["node", ".output/server/index.mjs"]
