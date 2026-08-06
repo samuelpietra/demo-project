@@ -39,6 +39,7 @@ function CurrentWorkoutPage() {
   const [reps, setReps] = useState("");
   const [weight, setWeight] = useState("");
   const [setToDelete, setSetToDelete] = useState<{ id: string; label: string } | null>(null);
+  const [isConfirmingComplete, setIsConfirmingComplete] = useState(false);
 
   const handleMovementChange = (movementId: string) => {
     setSelectedMovement(movementId);
@@ -111,7 +112,7 @@ function CurrentWorkoutPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-slate-900">Current Workout</h1>
-        <Button variant="outline" onClick={() => completeWorkoutMutation.mutate()}>
+        <Button variant="outline" onClick={() => setIsConfirmingComplete(true)}>
           <Check className="w-4 h-4 mr-2" />
           {completeWorkoutMutation.isPending ? "Completing..." : "Complete Workout"}
         </Button>
@@ -189,6 +190,20 @@ function CurrentWorkoutPage() {
           )}
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        open={isConfirmingComplete}
+        title="Complete workout?"
+        description="You won't be able to add more sets to it."
+        confirmLabel="Complete"
+        confirmVariant="default"
+        isPending={completeWorkoutMutation.isPending}
+        onConfirm={() => {
+          completeWorkoutMutation.mutate();
+          setIsConfirmingComplete(false);
+        }}
+        onCancel={() => setIsConfirmingComplete(false)}
+      />
 
       <ConfirmDialog
         open={setToDelete !== null}

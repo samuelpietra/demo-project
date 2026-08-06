@@ -75,5 +75,5 @@ export async function addSet(page: Page, movementName: string, weight: number, r
 
 /** Complete the active workout. */
 export async function completeWorkout(page: Page) {
-  await clickAndWaitForServerFn(page, page.getByRole("button", { name: /Complete Workout/i }));
+  await clickAndConfirm(page, page.getByRole("button", { name: /Complete Workout/i }), /^Complete$/);
 }

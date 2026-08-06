@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, type ButtonVariant } from "@/components/ui/button";
 
 interface ConfirmDialogProps {
   open: boolean;
   title: string;
   description?: string;
   confirmLabel?: string;
+  confirmVariant?: ButtonVariant;
   cancelLabel?: string;
   isPending?: boolean;
   onConfirm: () => void;
@@ -17,6 +18,7 @@ function ConfirmDialog({
   title,
   description,
   confirmLabel = "Delete",
+  confirmVariant = "destructive",
   cancelLabel = "Cancel",
   isPending = false,
   onConfirm,
@@ -53,7 +55,7 @@ function ConfirmDialog({
           <Button variant="outline" onClick={onCancel} disabled={isPending}>
             {cancelLabel}
           </Button>
-          <Button ref={confirmRef} variant="destructive" onClick={onConfirm} disabled={isPending}>
+          <Button ref={confirmRef} variant={confirmVariant} onClick={onConfirm} disabled={isPending}>
             {confirmLabel}
           </Button>
         </div>
