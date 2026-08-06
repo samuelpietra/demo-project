@@ -79,6 +79,20 @@ every set).
 
 ---
 
+## UI polish backlog
+
+Known rough edges, not yet addressed:
+
+- **Counts don't agree with their nouns.** A single set renders "1 sets", and the same
+  applies to reps. Worth solving once rather than with a ternary per call site: a small
+  helper today, built on `Intl.PluralRules` if the app is ever localised. No i18n
+  library is installed, and adding one for a handful of strings would mean message
+  catalogs for no present benefit.
+- **The wordmark still reads "Better Bookkeeping"** after the rebrand to Visor.
+- **`config.client.ts` logs the client configuration on every page load.**
+
+---
+
 ## Admin boards
 
 - **Authorization first.** A `role` on `User` and an `adminMiddleware` beside
