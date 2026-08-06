@@ -39,9 +39,9 @@ jobs:
           bun-version: latest
       - name: Install dependencies
         run: bun install
-      # prisma/generated is gitignored, so the client must be built here or every
-      # module importing it fails to resolve.
-      - name: Generate Prisma client
+      # The Prisma client and the router's route tree are both gitignored, so
+      # they must be generated here or typecheck resolves neither.
+      - name: Generate Prisma client and route tree
         run: bun run generate
       - name: Run typecheck
         run: bun run typecheck

@@ -54,11 +54,11 @@ ok "$ENV_FILE loaded"
 
 # --- 2. Prisma client ---------------------------------------------------------
 
-step "Generating Prisma client"
-# prisma/generated is gitignored, so a fresh clone has no client at all, and
-# every server module importing it fails to typecheck or run until this happens.
-quietly bun run generate || fail "prisma generate failed (see output above)"
-ok "Client generated at prisma/generated/client"
+step "Generating Prisma client and route tree"
+# Both are gitignored, so a fresh clone has neither, and every module importing
+# them fails to typecheck or run until this happens.
+quietly bun run generate || fail "code generation failed (see output above)"
+ok "Prisma client and src/routeTree.gen.ts generated"
 
 # --- 3. Database --------------------------------------------------------------
 

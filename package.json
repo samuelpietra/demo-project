@@ -13,7 +13,7 @@
     "serve": "vite preview",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "generate": "prisma generate",
+    "generate": "prisma generate && tsr generate",
     "test": "playwright test",
     "test:ui": "playwright test --ui"
   },
