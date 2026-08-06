@@ -56,6 +56,9 @@ Please use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/
 # Install dependencies
 bun install
 
+# Create your local environment file (gitignored) — required, see Environment below
+cp .env.local.example .env.local
+
 # Start development server with Docker (includes PostgreSQL)
 bun run dev
 
@@ -63,11 +66,27 @@ bun run dev
 bun run dev:down
 ```
 
+### Environment
+
+`.env` holds committed, non-secret configuration. Everything else lives in `.env.local`,
+which is gitignored — copy `.env.local.example` to create it.
+
+The server validates its environment at boot (`src/lib/env.server.ts`) and **fails fast**:
+a missing or invalid value throws on startup rather than silently degrading a
+security check at runtime. Required variables:
+
+| Variable | Purpose |
+|----------|---------|
+| `ENVIRONMENT` | One of `development` \| `test` \| `staging` \| `production`. Gates dev-only UI. |
+| `DATABASE_URL` | PostgreSQL connection string. |
+| `COOKIE_SECRET` | HMAC key for session cookies. **No default on purpose** — a fallback baked into the source would be public, which would make every session token forgeable. Generate one with `openssl rand -hex 32`, and set a distinct value per deployed environment. |
+
 ### Running locally (recommended for development)
 
 ```bash
 nvm use                                                    # Node 22 (Playwright test runner)
 bun install
+cp .env.local.example .env.local                           # local env (gitignored)
 docker compose -f docker-compose.dev.yml up -d postgres    # start Postgres
 bun run db:migrate                                         # apply migrations
 bun run db:seed                                            # seed demo users + data

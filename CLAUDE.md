@@ -24,7 +24,7 @@ This project uses **Bun** as the package manager and runtime.
 
 - The app serves on **port 3902** (set by `PORT` in `.env`), not 3000. The `.env` `PORT` overrides Vite's `--port` flag.
 - `.env` ships committed config-only values and defaults `DATABASE_URL` to SQLite; the app actually targets **PostgreSQL**. Override secrets/URLs in `.env.local` (gitignored). See `.env.local.example`.
-- Server code reads `DATABASE_URL` and `COOKIE_SECRET` from `process.env` (Docker injects them; local runs pass them explicitly, as `dev:local` does).
+- Server env (`ENVIRONMENT`, `DATABASE_URL`, `COOKIE_SECRET`) is Zod-validated once at boot in `env.server.ts` and fails fast when anything is missing. `dev:local` passes `ENVIRONMENT`/`DATABASE_URL` inline, but `COOKIE_SECRET` has no default and comes from `.env.local` — so that file must exist before the first run (`cp .env.local.example .env.local`).
 
 ## Architecture
 

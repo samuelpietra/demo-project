@@ -12,6 +12,9 @@ import { z } from "zod";
 const serverEnvSchema = z.object({
   ENVIRONMENT: z.enum(["development", "test", "staging", "production"]),
   DATABASE_URL: z.string().min(1),
+  // No default on purpose: a fallback would be public in the source, which
+  // makes every session token forgeable.
+  COOKIE_SECRET: z.string().min(1),
 });
 
 const parsed = serverEnvSchema.safeParse(process.env);

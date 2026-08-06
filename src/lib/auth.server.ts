@@ -4,11 +4,13 @@ import { redirect } from "@tanstack/react-router";
 import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
 import { createMiddleware, createServerFn } from "@tanstack/react-start";
 import { sessionCookieName } from "./auth.consts";
+import { serverEnv } from "./env.server";
 import { getServerSidePrismaClient } from "./db.server";
 import { z } from "zod";
 
-// In production, use a proper secret from environment variables
-const COOKIE_SECRET = process.env.COOKIE_SECRET || "dev-secret-change-in-production";
+// Validated at boot (env.server.ts) with no fallback, so a missing secret fails
+// loudly instead of silently signing sessions with a value that is public.
+const COOKIE_SECRET = serverEnv.COOKIE_SECRET;
 
 // bcrypt work factor: higher is more resistant to brute force but costs more
 // CPU per hash. 10 is the widely-used default; raise it as hardware improves.
