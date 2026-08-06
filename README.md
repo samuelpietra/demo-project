@@ -75,10 +75,10 @@ The server validates its environment at boot (`src/lib/env.server.ts`) and **fai
 a missing or invalid value throws on startup rather than silently degrading a
 security check at runtime. Required variables:
 
-| Variable | Purpose |
-|----------|---------|
-| `ENVIRONMENT` | One of `development` \| `test` \| `staging` \| `production`. Gates dev-only UI. |
-| `DATABASE_URL` | PostgreSQL connection string. |
+| Variable        | Purpose                                                                                                                                                                                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ENVIRONMENT`   | One of `development` \| `test` \| `staging` \| `production`. Gates dev-only UI.                                                                                                                                                                          |
+| `DATABASE_URL`  | PostgreSQL connection string.                                                                                                                                                                                                                            |
 | `COOKIE_SECRET` | HMAC key for session cookies. **No default on purpose** — a fallback baked into the source would be public, which would make every session token forgeable. Generate one with `openssl rand -hex 32`, and set a distinct value per deployed environment. |
 
 ### Running locally (recommended for development)
@@ -87,9 +87,7 @@ security check at runtime. Required variables:
 nvm use                                                    # Node 22 (Playwright test runner)
 bun install
 cp .env.local.example .env.local                           # local env (gitignored)
-docker compose -f docker-compose.dev.yml up -d postgres    # start Postgres
-bun run db:migrate                                         # apply migrations
-bun run db:seed                                            # seed demo users + data
+bun run setup                                              # Postgres, Prisma client, migrations, demo data
 bun run dev:local                                          # run the app at http://localhost:3902
 ```
 
@@ -104,6 +102,7 @@ bun run test       # Playwright e2e suite (boots the app automatically)
 
 ### Available Scripts
 
+- `bun run setup` - One-shot local setup: Prisma client, Postgres, migrations, demo data, typecheck. Doesn't start the app.
 - `bun run dev` - Start development server with Docker
 - `bun run dev:down` - Stop Docker services
 - `bun run dev:local` - Run the app locally (Vite) against Dockerized Postgres, without rebuilding the app container. Requires `docker compose -f docker-compose.dev.yml up -d postgres` first.
@@ -118,11 +117,11 @@ bun run test       # Playwright e2e suite (boots the app automatically)
 
 Run `bun run db:seed` to populate the database with three demo users (all with password `demo1234`):
 
-| Email                | Password   | Data                                    |
-| -------------------- | ---------- | --------------------------------------- |
-| `arnold@example.com` | `demo1234` | Movements + workout history             |
-| `ronnie@example.com` | `demo1234` | Movements + workout history             |
-| `john@example.com`   | `demo1234` | Empty account (for fresh/empty states)  |
+| Email                | Password   | Data                                   |
+| -------------------- | ---------- | -------------------------------------- |
+| `arnold@example.com` | `demo1234` | Movements + workout history            |
+| `ronnie@example.com` | `demo1234` | Movements + workout history            |
+| `john@example.com`   | `demo1234` | Empty account (for fresh/empty states) |
 
 In the `development` and `test` environments, the sign-in page shows a panel with one-click logins for these accounts.
 

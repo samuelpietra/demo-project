@@ -3,11 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "setup": "./scripts/setup.sh",
     "dev": "./scripts/dev.sh up",
     "dev:down": "./scripts/dev.sh down",
     "dev:local": "prisma generate && ENVIRONMENT=development DATABASE_URL=postgresql://postgres:postgres@localhost:5432/demo_project vite dev",
     "db:migrate": "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/demo_project prisma migrate dev",
-    "db:seed": "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/demo_project bun prisma/seed.ts",
+    "db:seed": "prisma generate && DATABASE_URL=postgresql://postgres:postgres@localhost:5432/demo_project bun prisma/seed.ts",
     "build": "vite build",
     "serve": "vite preview",
     "format": "prettier --write .",
