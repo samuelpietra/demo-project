@@ -61,9 +61,15 @@ Domain logic is exposed via TanStack Start server functions:
 
 ```ts
 export const doThingServerFn = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])              // guards authenticated routes
-  .inputValidator(z.object({ /* ... */ }))   // Zod validation of input
-  .handler(async ({ context, data }) => { /* context.user is available */ });
+  .middleware([authMiddleware]) // guards authenticated routes
+  .inputValidator(
+    z.object({
+      /* ... */
+    }),
+  ) // Zod validation of input
+  .handler(async ({ context, data }) => {
+    /* context.user is available */
+  });
 ```
 
 `authMiddleware` (in `auth.server.ts`) loads the user from the signed session cookie and redirects to `/sign-in` if absent.

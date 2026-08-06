@@ -135,10 +135,7 @@ function WorkoutHistoryPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-wrap gap-3">
-              <Select
-                value={activeMovementId}
-                onChange={(e) => setSelectedMovementId(e.target.value)}
-                className="w-56">
+              <Select value={activeMovementId} onChange={(e) => setSelectedMovementId(e.target.value)} className="w-56">
                 {uniqueMovements.map(({ id, name }) => (
                   <option key={id} value={id}>
                     {name}
@@ -175,11 +172,7 @@ function WorkoutHistoryPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Completed Workouts</CardTitle>
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={handleDeleteSelected}
-            disabled={selectedWorkouts.size === 0}>
+          <Button size="sm" variant="destructive" onClick={handleDeleteSelected} disabled={selectedWorkouts.size === 0}>
             <Trash2 className="w-4 h-4 mr-2" />
             {deleteWorkoutsMutation.isPending ? "Deleting..." : `Delete Selected (${selectedWorkouts.size})`}
           </Button>

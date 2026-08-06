@@ -64,8 +64,7 @@ function CurrentWorkoutPage() {
   });
 
   const addSetMutation = useMutation({
-    mutationFn: (data: { movementId: string; reps: number; weight: number }) =>
-      addSetServerFn({ data }),
+    mutationFn: (data: { movementId: string; reps: number; weight: number }) => addSetServerFn({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: currentWorkoutQueryOptions().queryKey });
       setReps("");

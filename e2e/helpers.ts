@@ -10,9 +10,7 @@ import { randomUUID } from "node:crypto";
  */
 export async function clickAndWaitForServerFn(page: Page, locator: Locator) {
   for (let attempt = 0; attempt < 2; attempt++) {
-    const requested = page
-      .waitForRequest((r) => r.url().includes("/_serverFn/"), { timeout: 3_000 })
-      .catch(() => null);
+    const requested = page.waitForRequest((r) => r.url().includes("/_serverFn/"), { timeout: 3_000 }).catch(() => null);
     await locator.click();
     if (await requested) return;
     await page.waitForTimeout(300);
