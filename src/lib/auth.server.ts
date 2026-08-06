@@ -73,8 +73,11 @@ export const getUserServerFn = createServerFn().handler(async () => {
   }
 
   const prisma = await getServerSidePrismaClient();
+  // Explicit select: this value is returned to the browser (SSR payload and
+  // client-side navigations), so it must never carry the password hash.
   const user = await prisma.user.findUnique({
     where: { id: userId },
+    select: { id: true, email: true, name: true },
   });
 
   return user;
