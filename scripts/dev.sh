@@ -2,7 +2,7 @@
 
 set -e
 
-# Development script for abacus-document-parser
+# Development script for the demo project
 # Usage: ./scripts/dev.sh [up|down]
 
 COMPOSE_FILE="docker-compose.dev.yml"
