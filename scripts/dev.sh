@@ -20,7 +20,10 @@ case "${1}" in
     # Trap to kill tsr watch when script exits
     trap "kill $TSR_PID 2>/dev/null" EXIT
 
-    USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose --env-file ".env.local" -f $COMPOSE_FILE watch
+    # Both files: .env carries PORT, which the compose port mapping interpolates.
+    # Passing only .env.local replaces compose's default .env lookup, so the
+    # mapping would fall back to 3000 while the app inside listens on PORT.
+    USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose --env-file ".env" --env-file ".env.local" -f $COMPOSE_FILE watch
     ;;
   "down")
     echo "Shutting down Docker services..."

@@ -48,7 +48,9 @@ services:
       dockerfile: Dockerfile
       target: development
     ports:
-      - ${PORT:-3000}:3000
+      # Same port both sides: PORT (from .env) overrides the --port flag in the
+      # container's vite command, so publishing 3000 would reach nothing.
+      - ${PORT:-3000}:${PORT:-3000}
     develop:
       watch:
         - action: sync
