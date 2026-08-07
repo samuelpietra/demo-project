@@ -99,8 +99,9 @@ Then open http://localhost:3902 and use a demo login from the sign-in page.
 ### Running the tests
 
 ```bash
-nvm use            # Node 22 is required for the Playwright test runner
-bun run test       # Playwright e2e suite (boots the app automatically)
+nvm use                            # Node 22 is required for the Playwright test runner
+bunx playwright install chromium   # once per machine — Playwright uses its own browser build
+bun run test                       # Playwright e2e suite (boots the app automatically)
 ```
 
 ### Available Scripts
