@@ -59,6 +59,9 @@ bun install
 # Create your local environment file (gitignored) — required, see Environment below
 cp .env.local.example .env.local
 
+# Prepare the database: Prisma client, Postgres, migrations, demo data
+bun run setup
+
 # Start development server with Docker (includes PostgreSQL)
 bun run dev
 
